@@ -24,8 +24,8 @@ Original files in the repository root were not modified.
 ## Run
 
 ```bash
-pip install -r improved_version/requirements.txt
-python improved_version/app.py
+pip install -r requirements.txt
+python app.py
 ```
 
 Open `http://127.0.0.1:5000`.
