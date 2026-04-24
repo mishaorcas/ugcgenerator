@@ -61,26 +61,33 @@ def _replace_primary_author_before_lead(text: str) -> str:
 
     link_match = _AUTHOR_LINK_PATTERN.search(before_lead)
     if link_match:
-        return _replace_author_match_with_author_tag(before_lead, link_match) + after_lead
+        return _move_primary_author_to_top(before_lead, after_lead, link_match)
 
     name_match = _AUTHOR_NAME_PATTERN.search(before_lead)
     if name_match and _is_probable_author_name(" ".join(name_match.group("name").split())):
-        return _replace_author_match_with_author_tag(before_lead, name_match) + after_lead
+        return _move_primary_author_to_top(before_lead, after_lead, name_match)
 
     return text
 
 
-def _replace_author_match_with_author_tag(text: str, match: Match[str]) -> str:
+def _move_primary_author_to_top(
+    before_lead: str,
+    after_lead: str,
+    match: Match[str],
+) -> str:
     description = match.group("description").strip()
     if not description:
-        return text
+        return before_lead + after_lead
 
     replacement = (
         "<author>\n"
         f"    <description>{description}</description>\n"
         "</author>"
     )
-    return text[: match.start()] + replacement + text[match.end() :]
+    remaining = (before_lead[: match.start()] + before_lead[match.end() :] + after_lead).strip()
+    if not remaining:
+        return replacement
+    return f"{replacement}\n\n{remaining}"
 
 
 def _replace_author_with_social_id(text: str) -> str:
