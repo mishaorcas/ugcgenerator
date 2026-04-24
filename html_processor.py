@@ -7,6 +7,7 @@ _HL_PATTERN = re.compile(r"<hl\b[^>]*>(?P<content>.*?)</hl>", re.DOTALL | re.IGN
 _H2_BLOCK_SPLIT_PATTERN = re.compile(r"(<h2\b[^>]*>.*?</h2>)", re.DOTALL | re.IGNORECASE)
 _H2_BLOCK_FULL_PATTERN = re.compile(r"<h2\b[^>]*>.*?</h2>", re.DOTALL | re.IGNORECASE)
 _HL_PLACEHOLDER_PATTERN = re.compile(r"__HL_PLACEHOLDER_(\d+)__")
+_LEAD_PATTERN = re.compile(r"<lead\b[^>]*>.*?</lead>", re.DOTALL | re.IGNORECASE)
 
 _AUTHOR_LINK_PATTERN = re.compile(
     r"<p>\s*\{(?P<name>[^{}\n]{1,80})\}\((?P<link>[^)\s]+)\)\s*</p>\s*"
@@ -32,6 +33,7 @@ def process_html(text: str) -> str:
 
     processed = text.replace("\r\n", "\n").replace("\r", "\n")
     processed, hl_contents = _extract_hl_blocks(processed)
+    processed = _replace_primary_author_before_lead(processed)
     processed = _replace_author_with_social_id(processed)
     processed = _replace_author_with_name(processed)
     processed = _restore_hl_blocks(processed, hl_contents)
@@ -47,6 +49,38 @@ def _extract_hl_blocks(text: str) -> tuple[str, list[str]]:
         return f"__HL_PLACEHOLDER_{len(hl_contents) - 1}__"
 
     return _HL_PATTERN.sub(save_hl, text), hl_contents
+
+
+def _replace_primary_author_before_lead(text: str) -> str:
+    lead_match = _LEAD_PATTERN.search(text)
+    if not lead_match:
+        return text
+
+    before_lead = text[: lead_match.start()]
+    after_lead = text[lead_match.start() :]
+
+    link_match = _AUTHOR_LINK_PATTERN.search(before_lead)
+    if link_match:
+        return _replace_author_match_with_author_tag(before_lead, link_match) + after_lead
+
+    name_match = _AUTHOR_NAME_PATTERN.search(before_lead)
+    if name_match and _is_probable_author_name(" ".join(name_match.group("name").split())):
+        return _replace_author_match_with_author_tag(before_lead, name_match) + after_lead
+
+    return text
+
+
+def _replace_author_match_with_author_tag(text: str, match: Match[str]) -> str:
+    description = match.group("description").strip()
+    if not description:
+        return text
+
+    replacement = (
+        "<author>\n"
+        f"    <description>{description}</description>\n"
+        "</author>"
+    )
+    return text[: match.start()] + replacement + text[match.end() :]
 
 
 def _replace_author_with_social_id(text: str) -> str:
