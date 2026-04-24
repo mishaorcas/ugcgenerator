@@ -42,6 +42,22 @@ class HtmlProcessorTests(unittest.TestCase):
         result = process_html(source)
         self.assertNotIn("<author-ugc", result)
 
+    def test_primary_author_before_lead_is_converted_to_author(self) -> None:
+        source = (
+            "<p>За и против: <span>стоит&nbsp;ли</span> поддерживать связь с бывшими одноклассниками</p>\n\n"
+            "<p>Аргументы читателей</p>\n\n"
+            "<p>{Ольга Карасева}(https://t-j.ru/user2111814)</p>\n\n"
+            "<p>выслушала обе стороны</p>\n\n"
+            "<lead><nobr>Кто-то</nobr> после окончания школы остается на связи с бывшими "
+            "одноклассниками, а <nobr>кто-то</nobr> принципиально их избегает.</lead>"
+        )
+        result = process_html(source)
+        self.assertIn("<author>", result)
+        self.assertIn("<description>выслушала обе стороны</description>", result)
+        self.assertNotIn("{Ольга Карасева}", result)
+        self.assertNotIn("<author-ugc", result.split("<lead>", 1)[0])
+        self.assertIn("<lead><nobr>Кто-то</nobr>", result)
+
 
 if __name__ == "__main__":
     unittest.main()
