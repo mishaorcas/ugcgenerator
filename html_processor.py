@@ -8,6 +8,10 @@ _H2_BLOCK_SPLIT_PATTERN = re.compile(r"(<h2\b[^>]*>.*?</h2>)", re.DOTALL | re.IG
 _H2_BLOCK_FULL_PATTERN = re.compile(r"<h2\b[^>]*>.*?</h2>", re.DOTALL | re.IGNORECASE)
 _HL_PLACEHOLDER_PATTERN = re.compile(r"__HL_PLACEHOLDER_(\d+)__")
 _LEAD_PATTERN = re.compile(r"<lead\b[^>]*>.*?</lead>", re.DOTALL | re.IGNORECASE)
+_EMPTY_AUTHOR_PATTERN = re.compile(
+    r"<author>\s*<description>\s*</description>\s*</author>",
+    re.DOTALL | re.IGNORECASE,
+)
 
 _AUTHOR_LINK_PATTERN = re.compile(
     r"<p>\s*\{(?P<name>[^{}\n]{1,80})\}\((?P<link>[^)\s]+)\)\s*</p>\s*"
@@ -37,6 +41,7 @@ def process_html(text: str) -> str:
     processed = _replace_author_with_social_id(processed)
     processed = _replace_author_with_name(processed)
     processed = _restore_hl_blocks(processed, hl_contents)
+    processed = _remove_empty_author_blocks(processed)
     processed = _normalize_spacing(processed)
     return processed.strip()
 
@@ -84,10 +89,25 @@ def _move_primary_author_to_top(
         f"    <description>{description}</description>\n"
         "</author>"
     )
-    remaining = (before_lead[: match.start()] + before_lead[match.end() :] + after_lead).strip()
+
+    remaining_before_lead = before_lead[: match.start()] + before_lead[match.end() :]
+    filled_existing_author, replacements = _EMPTY_AUTHOR_PATTERN.subn(
+        replacement,
+        remaining_before_lead,
+        count=1,
+    )
+    if replacements > 0:
+        merged = f"{filled_existing_author}{after_lead}".strip()
+        return merged
+
+    remaining = (remaining_before_lead + after_lead).strip()
     if not remaining:
         return replacement
     return f"{replacement}\n\n{remaining}"
+
+
+def _remove_empty_author_blocks(text: str) -> str:
+    return _EMPTY_AUTHOR_PATTERN.sub("", text)
 
 
 def _replace_author_with_social_id(text: str) -> str:
