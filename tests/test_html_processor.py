@@ -59,6 +59,32 @@ class HtmlProcessorTests(unittest.TestCase):
         self.assertIn("<lead><nobr>Кто-то</nobr>", result)
         self.assertTrue(result.startswith("<author>"))
 
+    def test_existing_empty_author_is_filled(self) -> None:
+        source = (
+            "<author>\n"
+            "    <description></description>\n"
+            "</author>\n\n"
+            "<p>{Ольга Карасева}(https://t-j.ru/user2111814)</p>\n"
+            "<p>выслушала обе стороны</p>\n"
+            "<lead>Текст лида</lead>"
+        )
+        result = process_html(source)
+        self.assertEqual(result.count("<author>"), 1)
+        self.assertIn("<description>выслушала обе стороны</description>", result)
+        self.assertNotIn("<description></description>", result)
+        self.assertNotIn("{Ольга Карасева}", result)
+
+    def test_empty_author_without_data_is_removed(self) -> None:
+        source = (
+            "<author>\n"
+            "    <description></description>\n"
+            "</author>\n\n"
+            "<p>Просто текст</p>"
+        )
+        result = process_html(source)
+        self.assertNotIn("<author>", result)
+        self.assertIn("<p>Просто текст</p>", result)
+
 
 if __name__ == "__main__":
     unittest.main()
