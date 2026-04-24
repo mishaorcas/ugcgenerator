@@ -57,6 +57,7 @@ class HtmlProcessorTests(unittest.TestCase):
         self.assertNotIn("{Ольга Карасева}", result)
         self.assertNotIn("<author-ugc", result.split("<lead>", 1)[0])
         self.assertIn("<lead><nobr>Кто-то</nobr>", result)
+        self.assertTrue(result.startswith("<author>"))
 
 
 if __name__ == "__main__":
