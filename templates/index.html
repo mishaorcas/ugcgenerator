@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>HTML Processor</title>
+    <title>UGCGENERATOR</title>
     <style>
         :root {
             --bg: #0b3b54;
@@ -14,7 +14,6 @@
             --accent: #0c6b9f;
             --accent-soft: #e8f3fa;
             --danger: #c0392b;
-            --ok: #2e7d32;
         }
 
         * {
@@ -49,15 +48,80 @@
             margin-bottom: 6px;
         }
 
-        .header p {
-            opacity: 0.9;
-        }
-
         .panel {
             background: var(--panel);
             border: 1px solid var(--border);
             border-radius: 12px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            padding: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 220px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #fff;
+            color: var(--text);
+            font-size: 15px;
+            font-weight: 600;
+            padding: 11px 14px;
+            cursor: pointer;
+            transition: all 120ms ease-out;
+        }
+
+        .tab-btn.active {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+            color: var(--accent);
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        .status {
+            min-height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .status.busy::before {
+            content: "";
+            width: 14px;
+            height: 14px;
+            margin-right: 8px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .hint {
+            color: #d8edf9;
+            text-align: center;
+            margin-bottom: 16px;
+            font-size: 13px;
         }
 
         .toolbar {
@@ -92,31 +156,23 @@
             cursor: not-allowed;
         }
 
-        .status {
-            min-height: 24px;
-            display: flex;
+        .toggle {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            color: #fff;
+            gap: 8px;
             font-size: 14px;
-            margin-bottom: 12px;
+            font-weight: 600;
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #fff;
+            padding: 10px 14px;
         }
 
-        .status.busy::before {
-            content: "";
-            width: 14px;
-            height: 14px;
-            margin-right: 8px;
-            border-radius: 50%;
-            border: 2px solid rgba(255, 255, 255, 0.4);
-            border-top-color: #fff;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+        .toggle input {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--accent);
         }
 
         .grid {
@@ -157,11 +213,17 @@
             background: #f8fbfd;
         }
 
-        .hint {
-            color: var(--muted);
+        .error-line {
+            min-height: 22px;
             text-align: center;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
+            color: #ffd6d2;
             font-size: 13px;
+            font-weight: 600;
+        }
+
+        .error-line:empty {
+            margin-bottom: 0;
         }
 
         .sr-only {
@@ -187,6 +249,7 @@
             opacity: 0;
             transition: all 180ms ease-out;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            pointer-events: none;
         }
 
         .toast.show {
@@ -206,6 +269,10 @@
             textarea {
                 min-height: 320px;
             }
+
+            .tabs {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -215,38 +282,94 @@
             <h1>UGCGENERATOR</h1>
         </header>
 
-        <div class="status" id="status" aria-live="polite"></div>
-        <p class="hint">Горячие клавиши: Ctrl+Enter - запустить обработку, Esc - очистить все поля.</p>
-
-        <section class="panel toolbar">
-            <button class="btn" id="copyBtn" type="button">Копировать результат</button>
-            <button class="btn secondary" id="pasteBtn" type="button">Вставить из буфера</button>
-            <button class="btn secondary" id="clearBtn" type="button">Очистить все</button>
+        <section class="tabs panel" role="tablist" aria-label="Разделы приложения">
+            <button class="tab-btn active" id="htmlTabBtn" type="button" role="tab" aria-controls="htmlTabPanel" aria-selected="true" data-tab="html">
+                HTML Processor
+            </button>
+            <button class="tab-btn" id="pollTabBtn" type="button" role="tab" aria-controls="pollTabPanel" aria-selected="false" data-tab="poll">
+                Генератор опросов
+            </button>
         </section>
 
-        <section class="panel grid">
-            <article class="editor">
-                <div class="editor-header">Входной HTML</div>
-                <label for="inputText" class="sr-only">Входной HTML</label>
-                <textarea id="inputText" spellcheck="false" placeholder="Вставьте HTML для обработки..."></textarea>
-            </article>
-            <article class="editor">
-                <div class="editor-header">Результат</div>
-                <label for="outputText" class="sr-only">Результат</label>
-                <textarea id="outputText" spellcheck="false" readonly placeholder="Результат обработки появится здесь..."></textarea>
-            </article>
+        <section class="tab-panel active" id="htmlTabPanel" data-panel="html" role="tabpanel" aria-labelledby="htmlTabBtn">
+            <div class="status" id="status" aria-live="polite"></div>
+            <p class="hint">Горячие клавиши: Ctrl+Enter - запустить обработку, Esc - очистить поля активной вкладки.</p>
+
+            <section class="panel toolbar">
+                <button class="btn" id="copyBtn" type="button">Копировать результат</button>
+                <button class="btn secondary" id="pasteBtn" type="button">Вставить из буфера</button>
+                <button class="btn secondary" id="clearBtn" type="button">Очистить всё</button>
+            </section>
+
+            <section class="panel grid">
+                <article class="editor">
+                    <div class="editor-header">Входной HTML</div>
+                    <label for="inputText" class="sr-only">Входной HTML</label>
+                    <textarea id="inputText" spellcheck="false" placeholder="Вставьте HTML для обработки..."></textarea>
+                </article>
+                <article class="editor">
+                    <div class="editor-header">Результат</div>
+                    <label for="outputText" class="sr-only">Результат</label>
+                    <textarea id="outputText" spellcheck="false" readonly placeholder="Результат обработки появится здесь..."></textarea>
+                </article>
+            </section>
+        </section>
+
+        <section class="tab-panel" id="pollTabPanel" data-panel="poll" role="tabpanel" aria-labelledby="pollTabBtn" hidden>
+            <p class="hint">Первая строка - вопрос, каждая следующая строка - вариант в формате: эмодзи и текст ответа.</p>
+
+            <section class="panel toolbar">
+                <label class="toggle" for="multipleChoiceToggle">
+                    <input type="checkbox" id="multipleChoiceToggle">
+                    <span>⚡️ Опрос с чекбоксами</span>
+                </label>
+                <button class="btn" id="pollCopyBtn" type="button">Копировать JSON</button>
+                <button class="btn secondary" id="pollPasteBtn" type="button">Вставить из буфера</button>
+                <button class="btn secondary" id="pollClearBtn" type="button">Очистить всё</button>
+            </section>
+
+            <p class="error-line" id="pollError" aria-live="polite"></p>
+
+            <section class="panel grid">
+                <article class="editor">
+                    <div class="editor-header">Текст опроса</div>
+                    <label for="pollInputText" class="sr-only">Текст опроса</label>
+                    <textarea id="pollInputText" spellcheck="false" placeholder="Как вы моете окна?
+
+🧤 Шваброй
+🤖 Роботом
+🤪 Никак"></textarea>
+                </article>
+                <article class="editor">
+                    <div class="editor-header">JSON код</div>
+                    <label for="pollOutputText" class="sr-only">JSON код</label>
+                    <textarea id="pollOutputText" spellcheck="false" readonly placeholder="Сгенерированный JSON появится здесь..."></textarea>
+                </article>
+            </section>
         </section>
     </main>
 
     <div id="toast" class="toast" aria-live="polite"></div>
 
     <script>
+        const tabButtons = Array.from(document.querySelectorAll(".tab-btn"));
+        const tabPanels = Array.from(document.querySelectorAll(".tab-panel"));
+        let activeTab = "html";
+
         const inputEl = document.getElementById("inputText");
         const outputEl = document.getElementById("outputText");
         const statusEl = document.getElementById("status");
         const copyBtn = document.getElementById("copyBtn");
         const pasteBtn = document.getElementById("pasteBtn");
         const clearBtn = document.getElementById("clearBtn");
+
+        const pollInputEl = document.getElementById("pollInputText");
+        const pollOutputEl = document.getElementById("pollOutputText");
+        const pollErrorEl = document.getElementById("pollError");
+        const multipleChoiceToggleEl = document.getElementById("multipleChoiceToggle");
+        const pollCopyBtn = document.getElementById("pollCopyBtn");
+        const pollPasteBtn = document.getElementById("pollPasteBtn");
+        const pollClearBtn = document.getElementById("pollClearBtn");
 
         const toastEl = document.getElementById("toast");
 
@@ -255,6 +378,21 @@
         let latestRequestId = 0;
         let latestAppliedId = 0;
         let toastTimer = null;
+
+        function setActiveTab(tabName) {
+            activeTab = tabName;
+            tabButtons.forEach((button) => {
+                const isActive = button.dataset.tab === tabName;
+                button.classList.toggle("active", isActive);
+                button.setAttribute("aria-selected", String(isActive));
+            });
+
+            tabPanels.forEach((panel) => {
+                const isActive = panel.dataset.panel === tabName;
+                panel.classList.toggle("active", isActive);
+                panel.hidden = !isActive;
+            });
+        }
 
         function setBusyState(isBusy) {
             statusEl.classList.toggle("busy", isBusy);
@@ -333,6 +471,74 @@
             }
         }
 
+        function parsePollText(text) {
+            const lines = text
+                .split(/\r?\n/)
+                .map((line) => line.trim())
+                .filter((line) => line.length > 0);
+
+            if (lines.length === 0) {
+                return null;
+            }
+
+            const [question, ...answerLines] = lines;
+            if (!question) {
+                throw new Error("Укажите вопрос в первой строке.");
+            }
+
+            if (answerLines.length === 0) {
+                throw new Error("Добавьте варианты ответа на новых строках.");
+            }
+
+            const answers = answerLines.map((line, index) => {
+                const match = line.match(/^(\S+)\s+(.+)$/u);
+                if (!match) {
+                    throw new Error(`Строка ${index + 2}: формат должен быть "эмодзи текст ответа".`);
+                }
+
+                const answer = match[2].trim();
+                if (!answer) {
+                    throw new Error(`Строка ${index + 2}: текст ответа не может быть пустым.`);
+                }
+
+                return {
+                    icon: match[1],
+                    answer
+                };
+            });
+
+            const payload = {
+                mode: "percent",
+                answers,
+                question,
+                needLogin: true
+            };
+
+            if (multipleChoiceToggleEl.checked) {
+                payload.isMultipleChoice = true;
+            }
+
+            return payload;
+        }
+
+        function generatePollCode() {
+            const rawText = pollInputEl.value;
+            pollErrorEl.textContent = "";
+
+            if (!rawText.trim()) {
+                pollOutputEl.value = "";
+                return;
+            }
+
+            try {
+                const payload = parsePollText(rawText);
+                pollOutputEl.value = payload ? JSON.stringify(payload, null, 2) : "";
+            } catch (error) {
+                pollOutputEl.value = "";
+                pollErrorEl.textContent = error.message || "Не удалось сгенерировать JSON.";
+            }
+        }
+
         async function copyResult() {
             const value = outputEl.value;
             if (!value.trim()) {
@@ -361,7 +567,7 @@
             }
         }
 
-        function clearAll() {
+        function clearHtmlTab() {
             if (activeController) {
                 activeController.abort();
             }
@@ -372,24 +578,83 @@
             showToast("Поля очищены.");
         }
 
-        inputEl.addEventListener("input", scheduleProcessing);
-
-        inputEl.addEventListener("keydown", (event) => {
-            if (event.ctrlKey && event.key === "Enter") {
-                clearTimeout(debounceTimer);
-                void processInput();
+        async function copyPollResult() {
+            const value = pollOutputEl.value;
+            if (!value.trim()) {
+                showToast("Пока нечего копировать.", true);
+                return;
             }
+
+            try {
+                await navigator.clipboard.writeText(value);
+                showToast("JSON скопирован.");
+            } catch {
+                pollOutputEl.select();
+                document.execCommand("copy");
+                showToast("JSON скопирован.");
+            }
+        }
+
+        async function pastePollInput() {
+            try {
+                const text = await navigator.clipboard.readText();
+                pollInputEl.value = text;
+                generatePollCode();
+                showToast("Текст опроса вставлен из буфера.");
+            } catch {
+                showToast("Не удалось прочитать буфер обмена.", true);
+            }
+        }
+
+        function clearPollTab() {
+            pollInputEl.value = "";
+            pollOutputEl.value = "";
+            pollErrorEl.textContent = "";
+            multipleChoiceToggleEl.checked = false;
+            showToast("Поля очищены.");
+        }
+
+        function clearActiveTab() {
+            if (activeTab === "html") {
+                clearHtmlTab();
+                return;
+            }
+            clearPollTab();
+        }
+
+        tabButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+                setActiveTab(button.dataset.tab);
+            });
         });
+
+        inputEl.addEventListener("input", scheduleProcessing);
+        pollInputEl.addEventListener("input", generatePollCode);
+        multipleChoiceToggleEl.addEventListener("change", generatePollCode);
 
         document.addEventListener("keydown", (event) => {
             if (event.key === "Escape") {
-                clearAll();
+                clearActiveTab();
+                return;
+            }
+
+            if (event.ctrlKey && event.key === "Enter") {
+                if (activeTab === "html") {
+                    clearTimeout(debounceTimer);
+                    void processInput();
+                    return;
+                }
+                generatePollCode();
             }
         });
 
         copyBtn.addEventListener("click", copyResult);
         pasteBtn.addEventListener("click", pasteInput);
-        clearBtn.addEventListener("click", clearAll);
+        clearBtn.addEventListener("click", clearHtmlTab);
+
+        pollCopyBtn.addEventListener("click", copyPollResult);
+        pollPasteBtn.addEventListener("click", pastePollInput);
+        pollClearBtn.addEventListener("click", clearPollTab);
     </script>
 </body>
 </html>
