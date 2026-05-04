@@ -14,6 +14,9 @@
             --accent: #0c6b9f;
             --accent-soft: #e8f3fa;
             --danger: #c0392b;
+            --hero-top: #1f7cb0;
+            --hero-mid: #0c4f73;
+            --hint: #d8edf9;
         }
 
         * {
@@ -27,9 +30,22 @@
             font-family: "Segoe UI", "Noto Sans", Arial, sans-serif;
             color: var(--text);
             background:
-                radial-gradient(1200px 500px at 50% -100px, #1f7cb0, transparent 70%),
-                linear-gradient(180deg, #0c4f73, var(--bg));
+                radial-gradient(1200px 500px at 50% -100px, var(--hero-top), transparent 70%),
+                linear-gradient(180deg, var(--hero-mid), var(--bg));
             padding: 24px 16px;
+            transition: background 180ms ease-out;
+        }
+
+        body.poll-theme {
+            --bg: #14583a;
+            --border: #b9ddcb;
+            --text: #1f3a2c;
+            --muted: #47685a;
+            --accent: #289e66;
+            --accent-soft: #e8f7ef;
+            --hero-top: #39b97a;
+            --hero-mid: #1a7d4e;
+            --hint: #dff5ea;
         }
 
         .app {
@@ -118,7 +134,7 @@
         }
 
         .hint {
-            color: #d8edf9;
+            color: var(--hint);
             text-align: center;
             margin-bottom: 16px;
             font-size: 13px;
@@ -284,10 +300,10 @@
 
         <section class="tabs panel" role="tablist" aria-label="Разделы приложения">
             <button class="tab-btn active" id="htmlTabBtn" type="button" role="tab" aria-controls="htmlTabPanel" aria-selected="true" data-tab="html">
-                HTML Processor
+                🚀 UGC верстак
             </button>
             <button class="tab-btn" id="pollTabBtn" type="button" role="tab" aria-controls="pollTabPanel" aria-selected="false" data-tab="poll">
-                Генератор опросов
+                ✅ Генератор опросов
             </button>
         </section>
 
@@ -303,8 +319,8 @@
 
             <section class="panel grid">
                 <article class="editor">
-                    <div class="editor-header">Входной HTML</div>
-                    <label for="inputText" class="sr-only">Входной HTML</label>
+                    <div class="editor-header">Поле для исходного кода из верстака</div>
+                    <label for="inputText" class="sr-only">Поле для исходного кода из верстака</label>
                     <textarea id="inputText" spellcheck="false" placeholder="Вставьте HTML для обработки..."></textarea>
                 </article>
                 <article class="editor">
@@ -334,11 +350,7 @@
                 <article class="editor">
                     <div class="editor-header">Текст опроса</div>
                     <label for="pollInputText" class="sr-only">Текст опроса</label>
-                    <textarea id="pollInputText" spellcheck="false" placeholder="Как вы моете окна?
-
-🧤 Шваброй
-🤖 Роботом
-🤪 Никак"></textarea>
+                    <textarea id="pollInputText" spellcheck="false" placeholder="Вставьте опрос из обвеса..."></textarea>
                 </article>
                 <article class="editor">
                     <div class="editor-header">JSON код</div>
@@ -381,6 +393,7 @@
 
         function setActiveTab(tabName) {
             activeTab = tabName;
+            document.body.classList.toggle("poll-theme", tabName === "poll");
             tabButtons.forEach((button) => {
                 const isActive = button.dataset.tab === tabName;
                 button.classList.toggle("active", isActive);
