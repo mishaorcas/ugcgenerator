@@ -298,64 +298,64 @@
             <h1>UGCGENERATOR</h1>
         </header>
 
-        <section class="tabs panel" role="tablist" aria-label="Р Р°Р·РґРµР»С‹ РїСЂРёР»РѕР¶РµРЅРёСЏ">
+        <section class="tabs panel" role="tablist" aria-label="Разделы приложения">
             <button class="tab-btn active" id="htmlTabBtn" type="button" role="tab" aria-controls="htmlTabPanel" aria-selected="true" data-tab="html">
-                рџљЂ UGC РІРµСЂСЃС‚Р°Рє
+                🚀 UGC верстак
             </button>
             <button class="tab-btn" id="pollTabBtn" type="button" role="tab" aria-controls="pollTabPanel" aria-selected="false" data-tab="poll">
-                вњ… Р“РµРЅРµСЂР°С‚РѕСЂ РѕРїСЂРѕСЃРѕРІ
+                ✅ Генератор опросов
             </button>
         </section>
 
         <section class="tab-panel active" id="htmlTabPanel" data-panel="html" role="tabpanel" aria-labelledby="htmlTabBtn">            
-            <p class="hint">Р“РѕСЂСЏС‡РёРµ РєР»Р°РІРёС€Рё: Ctrl+Enter - Р·Р°РїСѓСЃС‚РёС‚СЊ РѕР±СЂР°Р±РѕС‚РєСѓ, Esc - РѕС‡РёСЃС‚РёС‚СЊ РїРѕР»СЏ Р°РєС‚РёРІРЅРѕР№ РІРєР»Р°РґРєРё.</p>
+            <p class="hint">Горячие клавиши: Ctrl+Enter - запустить обработку, Esc - очистить поля активной вкладки.</p>
             <div id="status" class="status" aria-live="polite"></div>
 
             <section class="panel toolbar">
-                <button class="btn" id="copyBtn" type="button">РљРѕРїРёСЂРѕРІР°С‚СЊ СЂРµР·СѓР»СЊС‚Р°С‚</button>
-                <button class="btn secondary" id="pasteBtn" type="button">Р’СЃС‚Р°РІРёС‚СЊ РёР· Р±СѓС„РµСЂР°</button>
-                <button class="btn secondary" id="clearBtn" type="button">РћС‡РёСЃС‚РёС‚СЊ РІСЃС‘</button>
+                <button class="btn" id="copyBtn" type="button">Копировать результат</button>
+                <button class="btn secondary" id="pasteBtn" type="button">Вставить из буфера</button>
+                <button class="btn secondary" id="clearBtn" type="button">Очистить всё</button>
             </section>
 
             <section class="panel grid">
                 <article class="editor">
-                    <div class="editor-header">РџРѕР»Рµ РґР»СЏ РёСЃС…РѕРґРЅРѕРіРѕ РєРѕРґР° РёР· РІРµСЂСЃС‚Р°РєР°</div>
-                    <label for="inputText" class="sr-only">РџРѕР»Рµ РґР»СЏ РёСЃС…РѕРґРЅРѕРіРѕ РєРѕРґР° РёР· РІРµСЂСЃС‚Р°РєР°</label>
-                    <textarea id="inputText" spellcheck="false" placeholder="Р’СЃС‚Р°РІСЊС‚Рµ HTML РґР»СЏ РѕР±СЂР°Р±РѕС‚РєРё..."></textarea>
+                    <div class="editor-header">Поле для исходного кода из верстака</div>
+                    <label for="inputText" class="sr-only">Поле для исходного кода из верстака</label>
+                    <textarea id="inputText" spellcheck="false" placeholder="Вставьте HTML для обработки..."></textarea>
                 </article>
                 <article class="editor">
-                    <div class="editor-header">Р РµР·СѓР»СЊС‚Р°С‚</div>
-                    <label for="outputText" class="sr-only">Р РµР·СѓР»СЊС‚Р°С‚</label>
-                    <textarea id="outputText" spellcheck="false" readonly placeholder="Р РµР·СѓР»СЊС‚Р°С‚ РѕР±СЂР°Р±РѕС‚РєРё РїРѕСЏРІРёС‚СЃСЏ Р·РґРµСЃСЊ..."></textarea>
+                    <div class="editor-header">Результат</div>
+                    <label for="outputText" class="sr-only">Результат</label>
+                    <textarea id="outputText" spellcheck="false" readonly placeholder="Результат обработки появится здесь..."></textarea>
                 </article>
             </section>
         </section>
 
         <section class="tab-panel" id="pollTabPanel" data-panel="poll" role="tabpanel" aria-labelledby="pollTabBtn" hidden>
-            <p class="hint">РџРµСЂРІР°СЏ СЃС‚СЂРѕРєР° - РІРѕРїСЂРѕСЃ, РєР°Р¶РґР°СЏ СЃР»РµРґСѓСЋС‰Р°СЏ СЃС‚СЂРѕРєР° - РІР°СЂРёР°РЅС‚ РІ С„РѕСЂРјР°С‚Рµ: СЌРјРѕРґР·Рё Рё С‚РµРєСЃС‚ РѕС‚РІРµС‚Р°.</p>
+            <p class="hint">Первая строка - вопрос, каждая следующая строка - вариант в формате: эмодзи и текст ответа.</p>
 
             <section class="panel toolbar">
                 <label class="toggle" for="multipleChoiceToggle">
                     <input type="checkbox" id="multipleChoiceToggle">
-                    <span>вљЎпёЏ РћРїСЂРѕСЃ СЃ С‡РµРєР±РѕРєСЃР°РјРё</span>
+                    <span>⚡️ Опрос с чекбоксами</span>
                 </label>
-                <button class="btn" id="pollCopyBtn" type="button">РљРѕРїРёСЂРѕРІР°С‚СЊ JSON</button>
-                <button class="btn secondary" id="pollPasteBtn" type="button">Р’СЃС‚Р°РІРёС‚СЊ РёР· Р±СѓС„РµСЂР°</button>
-                <button class="btn secondary" id="pollClearBtn" type="button">РћС‡РёСЃС‚РёС‚СЊ РІСЃС‘</button>
+                <button class="btn" id="pollCopyBtn" type="button">Копировать JSON</button>
+                <button class="btn secondary" id="pollPasteBtn" type="button">Вставить из буфера</button>
+                <button class="btn secondary" id="pollClearBtn" type="button">Очистить всё</button>
             </section>
 
             <p class="error-line" id="pollError" aria-live="polite"></p>
 
             <section class="panel grid">
                 <article class="editor">
-                    <div class="editor-header">РўРµРєСЃС‚ РѕРїСЂРѕСЃР°</div>
-                    <label for="pollInputText" class="sr-only">РўРµРєСЃС‚ РѕРїСЂРѕСЃР°</label>
-                    <textarea id="pollInputText" spellcheck="false" placeholder="Р’СЃС‚Р°РІСЊС‚Рµ РѕРїСЂРѕСЃ РёР· РѕР±РІРµСЃР°..."></textarea>
+                    <div class="editor-header">Текст опроса</div>
+                    <label for="pollInputText" class="sr-only">Текст опроса</label>
+                    <textarea id="pollInputText" spellcheck="false" placeholder="Вставьте опрос из обвеса..."></textarea>
                 </article>
                 <article class="editor">
-                    <div class="editor-header">JSON РєРѕРґ</div>
-                    <label for="pollOutputText" class="sr-only">JSON РєРѕРґ</label>
-                    <textarea id="pollOutputText" spellcheck="false" readonly placeholder="РЎРіРµРЅРµСЂРёСЂРѕРІР°РЅРЅС‹Р№ JSON РїРѕСЏРІРёС‚СЃСЏ Р·РґРµСЃСЊ..."></textarea>
+                    <div class="editor-header">JSON код</div>
+                    <label for="pollOutputText" class="sr-only">JSON код</label>
+                    <textarea id="pollOutputText" spellcheck="false" readonly placeholder="Сгенерированный JSON появится здесь..."></textarea>
                 </article>
             </section>
         </section>
@@ -412,7 +412,7 @@
                 return;
             }
             statusEl.classList.toggle("busy", isBusy);
-            statusEl.textContent = isBusy ? "РћР±СЂР°Р±РѕС‚РєР°..." : "";
+            statusEl.textContent = isBusy ? "Обработка..." : "";
         }
 
         function showToast(message, isError = false) {
@@ -478,7 +478,7 @@
                 if (error.name === "AbortError") {
                     return;
                 }
-                showToast(error.message || "РќРµ СѓРґР°Р»РѕСЃСЊ РѕР±СЂР°Р±РѕС‚Р°С‚СЊ С‚РµРєСЃС‚.", true);
+                showToast(error.message || "Не удалось обработать текст.", true);
             } finally {
                 if (requestId === latestRequestId) {
                     setBusyState(false);
@@ -498,22 +498,22 @@
 
             const [question, ...answerLines] = lines;
             if (!question) {
-                throw new Error("РЈРєР°Р¶РёС‚Рµ РІРѕРїСЂРѕСЃ РІ РїРµСЂРІРѕР№ СЃС‚СЂРѕРєРµ.");
+                throw new Error("Укажите вопрос в первой строке.");
             }
 
             if (answerLines.length === 0) {
-                throw new Error("Р”РѕР±Р°РІСЊС‚Рµ РІР°СЂРёР°РЅС‚С‹ РѕС‚РІРµС‚Р° РЅР° РЅРѕРІС‹С… СЃС‚СЂРѕРєР°С….");
+                throw new Error("Добавьте варианты ответа на новых строках.");
             }
 
             const answers = answerLines.map((line, index) => {
                 const match = line.match(/^(\S+)\s+(.+)$/u);
                 if (!match) {
-                    throw new Error(`РЎС‚СЂРѕРєР° ${index + 2}: С„РѕСЂРјР°С‚ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ "СЌРјРѕРґР·Рё С‚РµРєСЃС‚ РѕС‚РІРµС‚Р°".`);
+                    throw new Error(`Строка ${index + 2}: формат должен быть "эмодзи текст ответа".`);
                 }
 
                 const answer = match[2].trim();
                 if (!answer) {
-                    throw new Error(`РЎС‚СЂРѕРєР° ${index + 2}: С‚РµРєСЃС‚ РѕС‚РІРµС‚Р° РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РїСѓСЃС‚С‹Рј.`);
+                    throw new Error(`Строка ${index + 2}: текст ответа не может быть пустым.`);
                 }
 
                 return {
@@ -550,24 +550,24 @@
                 pollOutputEl.value = payload ? JSON.stringify(payload, null, 2) : "";
             } catch (error) {
                 pollOutputEl.value = "";
-                pollErrorEl.textContent = error.message || "РќРµ СѓРґР°Р»РѕСЃСЊ СЃРіРµРЅРµСЂРёСЂРѕРІР°С‚СЊ JSON.";
+                pollErrorEl.textContent = error.message || "Не удалось сгенерировать JSON.";
             }
         }
 
         async function copyResult() {
             const value = outputEl.value;
             if (!value.trim()) {
-                showToast("РџРѕРєР° РЅРµС‡РµРіРѕ РєРѕРїРёСЂРѕРІР°С‚СЊ.", true);
+                showToast("Пока нечего копировать.", true);
                 return;
             }
 
             try {
                 await navigator.clipboard.writeText(value);
-                showToast("Р РµР·СѓР»СЊС‚Р°С‚ СЃРєРѕРїРёСЂРѕРІР°РЅ.");
+                showToast("Результат скопирован.");
             } catch {
                 outputEl.select();
                 document.execCommand("copy");
-                showToast("Р РµР·СѓР»СЊС‚Р°С‚ СЃРєРѕРїРёСЂРѕРІР°РЅ.");
+                showToast("Результат скопирован.");
             }
         }
 
@@ -576,9 +576,9 @@
                 const text = await navigator.clipboard.readText();
                 inputEl.value = text;
                 scheduleProcessing();
-                showToast("РўРµРєСЃС‚ РІСЃС‚Р°РІР»РµРЅ РёР· Р±СѓС„РµСЂР°.");
+                showToast("Текст вставлен из буфера.");
             } catch {
-                showToast("РќРµ СѓРґР°Р»РѕСЃСЊ РїСЂРѕС‡РёС‚Р°С‚СЊ Р±СѓС„РµСЂ РѕР±РјРµРЅР°.", true);
+                showToast("Не удалось прочитать буфер обмена.", true);
             }
         }
 
@@ -590,23 +590,23 @@
             inputEl.value = "";
             outputEl.value = "";
             setBusyState(false);
-            showToast("РџРѕР»СЏ РѕС‡РёС‰РµРЅС‹.");
+            showToast("Поля очищены.");
         }
 
         async function copyPollResult() {
             const value = pollOutputEl.value;
             if (!value.trim()) {
-                showToast("РџРѕРєР° РЅРµС‡РµРіРѕ РєРѕРїРёСЂРѕРІР°С‚СЊ.", true);
+                showToast("Пока нечего копировать.", true);
                 return;
             }
 
             try {
                 await navigator.clipboard.writeText(value);
-                showToast("JSON СЃРєРѕРїРёСЂРѕРІР°РЅ.");
+                showToast("JSON скопирован.");
             } catch {
                 pollOutputEl.select();
                 document.execCommand("copy");
-                showToast("JSON СЃРєРѕРїРёСЂРѕРІР°РЅ.");
+                showToast("JSON скопирован.");
             }
         }
 
@@ -615,9 +615,9 @@
                 const text = await navigator.clipboard.readText();
                 pollInputEl.value = text;
                 generatePollCode();
-                showToast("РўРµРєСЃС‚ РѕРїСЂРѕСЃР° РІСЃС‚Р°РІР»РµРЅ РёР· Р±СѓС„РµСЂР°.");
+                showToast("Текст опроса вставлен из буфера.");
             } catch {
-                showToast("РќРµ СѓРґР°Р»РѕСЃСЊ РїСЂРѕС‡РёС‚Р°С‚СЊ Р±СѓС„РµСЂ РѕР±РјРµРЅР°.", true);
+                showToast("Не удалось прочитать буфер обмена.", true);
             }
         }
 
@@ -626,7 +626,7 @@
             pollOutputEl.value = "";
             pollErrorEl.textContent = "";
             multipleChoiceToggleEl.checked = false;
-            showToast("РџРѕР»СЏ РѕС‡РёС‰РµРЅС‹.");
+            showToast("Поля очищены.");
         }
 
         function clearActiveTab() {
