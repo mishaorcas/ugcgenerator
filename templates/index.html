@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✅</text></svg>">
+    <title>Pollsmaster</title>
+    <style>
+        :root {
+            --bg: #0b3b54;
+            --panel: #ffffff;
+            --border: #d7e0e7;
+            --text: #22313c;
+            --muted: #5f707d;
+            --accent: #0c6b9f;
+            --accent-soft: #e8f3fa;
+            --danger: #c0392b;
+            --hero-top: #1f7cb0;
+            --hero-mid: #0c4f73;
+            --hint: #d8edf9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: "Segoe UI", "Noto Sans", Arial, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(1200px 500px at 50% -100px, var(--hero-top), transparent 70%),
+                linear-gradient(180deg, var(--hero-mid), var(--bg));
+            padding: 24px 16px;
+            transition: background 180ms ease-out;
+        }
+
+        body.poll-theme {
+            --bg: #14583a;
+            --border: #b9ddcb;
+            --text: #1f3a2c;
+            --muted: #47685a;
+            --accent: #289e66;
+            --accent-soft: #e8f7ef;
+            --hero-top: #39b97a;
+            --hero-mid: #1a7d4e;
+            --hint: #dff5ea;
+        }
+
+        .app {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            color: #fff;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 30px;
+            margin-bottom: 6px;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            padding: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 220px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #fff;
+            color: var(--text);
+            font-size: 15px;
+            font-weight: 600;
+            padding: 11px 14px;
+            cursor: pointer;
+            transition: all 120ms ease-out;
+        }
+
+        .tab-btn.active {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+            color: var(--accent);
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .status:not(:empty) {
+            min-height: 24px;
+            margin-bottom: 12px;
+        }
+
+        .status.busy::before {
+            content: "";
+            width: 14px;
+            height: 14px;
+            margin-right: 8px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .hint {
+            color: var(--hint);
+            text-align: center;
+            margin-bottom: 16px;
+            font-size: 13px;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .btn {
+            border: 1px solid transparent;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .btn.secondary {
+            background: #fff;
+            color: var(--text);
+            border-color: var(--border);
+        }
+
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #fff;
+            padding: 10px 14px;
+        }
+
+        .toggle input {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--accent);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            padding: 16px;
+        }
+
+        .editor {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .editor-header {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            background: var(--accent-soft);
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 420px;
+            border: 0;
+            resize: vertical;
+            outline: 0;
+            padding: 14px;
+            line-height: 1.6;
+            font-family: "Cascadia Code", "Consolas", monospace;
+            font-size: 14px;
+        }
+
+        textarea[readonly] {
+            background: #f8fbfd;
+        }
+
+        .error-line {
+            min-height: 22px;
+            text-align: center;
+            margin-bottom: 12px;
+            color: #ffd6d2;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .error-line:empty {
+            margin-bottom: 0;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+        .toast {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            background: #24323d;
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px 14px;
+            transform: translateY(80px);
+            opacity: 0;
+            transition: all 180ms ease-out;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            pointer-events: none;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.error {
+            background: var(--danger);
+        }
+
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            textarea {
+                min-height: 320px;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body class="poll-theme">
+    <main class="app">
+=======
+        <header class="header">
+            <h1>Pollsmaster</h1>
+        </header>
+
+        <section class="tabs panel" role="tablist" aria-label="Разделы приложения">
+            <button class="tab-btn active" id="pollTabBtn" type="button" role="tab" aria-controls="pollTabPanel" aria-selected="true" data-tab="poll">
+                ✅ Генератор опросов
+            </button>
+            <button class="tab-btn" id="htmlTabBtn" type="button" role="tab" aria-controls="htmlTabPanel" aria-selected="false" data-tab="html">
+                🚀 UGC верстак
+            </button>
+        </section>
+
+        <section class="tab-panel active" id="pollTabPanel" data-panel="poll" role="tabpanel" aria-labelledby="pollTabBtn">
+            <p class="hint">Первая строка - вопрос, каждая следующая строка - вариант в формате: эмодзи и текст ответа.</p>
+
+            <section class="panel toolbar">
+                <label class="toggle" for="multipleChoiceToggle">
+                    <input type="checkbox" id="multipleChoiceToggle">
+                    <span>⚡️ Опрос с чекбоксами</span>
+                </label>
+                <button class="btn" id="pollCopyBtn" type="button">Копировать JSON</button>
+                <button class="btn secondary" id="pollPasteBtn" type="button">Вставить из буфера</button>
+                <button class="btn secondary" id="pollClearBtn" type="button">Очистить всё</button>
+            </section>
+
+            <p class="error-line" id="pollError" aria-live="polite"></p>
+
+            <section class="panel grid">
+                <article class="editor">
+                    <div class="editor-header">Текст опроса</div>
+                    <label for="pollInputText" class="sr-only">Текст опроса</label>
+                    <textarea id="pollInputText" spellcheck="false" placeholder="Вставьте опрос из обвеса..."></textarea>
+                </article>
+                <article class="editor">
+                    <div class="editor-header">JSON код</div>
+                    <label for="pollOutputText" class="sr-only">JSON код</label>
+                    <textarea id="pollOutputText" spellcheck="false" readonly placeholder="Сгенерированный JSON появится здесь..."></textarea>
+                </article>
+            </section>
+        </section>
+
+        <section class="tab-panel" id="htmlTabPanel" data-panel="html" role="tabpanel" aria-labelledby="htmlTabBtn" hidden>
+            <p class="hint">Горячие клавиши: Ctrl+Enter - запустить обработку, Esc - очистить поля активной вкладки.</p>
+            <div id="status" class="status" aria-live="polite"></div>
+
+            <section class="panel toolbar">
+                <button class="btn" id="copyBtn" type="button">Копировать результат</button>
+                <button class="btn secondary" id="pasteBtn" type="button">Вставить из буфера</button>
+                <button class="btn secondary" id="clearBtn" type="button">Очистить всё</button>
+            </section>
+
+            <section class="panel grid">
+                <article class="editor">
+                    <div class="editor-header">Поле для исходного кода из верстака</div>
+                    <label for="inputText" class="sr-only">Поле для исходного кода из верстака</label>
+                    <textarea id="inputText" spellcheck="false" placeholder="Вставьте код из верстака для обработки..."></textarea>
+                </article>
+                <article class="editor">
+                    <div class="editor-header">Результат</div>
+                    <label for="outputText" class="sr-only">Результат</label>
+                    <textarea id="outputText" spellcheck="false" readonly placeholder="Результат обработки появится здесь..."></textarea>
+                </article>
+            </section>
+        </section>
+    </main>
+
+    <div id="toast" class="toast" aria-live="polite"></div>
+
+    <script>
+        const tabButtons = Array.from(document.querySelectorAll(".tab-btn"));
+        const tabPanels = Array.from(document.querySelectorAll(".tab-panel"));
+        let activeTab = "poll";
+
+        const inputEl = document.getElementById("inputText");
+        const outputEl = document.getElementById("outputText");
+        const statusEl = document.getElementById("status");
+        const copyBtn = document.getElementById("copyBtn");
+        const pasteBtn = document.getElementById("pasteBtn");
+        const clearBtn = document.getElementById("clearBtn");
+
+        const pollInputEl = document.getElementById("pollInputText");
+        const pollOutputEl = document.getElementById("pollOutputText");
+        const pollErrorEl = document.getElementById("pollError");
+        const multipleChoiceToggleEl = document.getElementById("multipleChoiceToggle");
+        const pollCopyBtn = document.getElementById("pollCopyBtn");
+        const pollPasteBtn = document.getElementById("pollPasteBtn");
+        const pollClearBtn = document.getElementById("pollClearBtn");
+
+        const toastEl = document.getElementById("toast");
+
+        let debounceTimer = null;
+        let activeController = null;
+        let latestRequestId = 0;
+        let latestAppliedId = 0;
+        let toastTimer = null;
+
+        function setActiveTab(tabName) {
+            activeTab = tabName;
+            document.body.classList.toggle("poll-theme", tabName === "poll");
+            tabButtons.forEach((button) => {
+                const isActive = button.dataset.tab === tabName;
+                button.classList.toggle("active", isActive);
+                button.setAttribute("aria-selected", String(isActive));
+            });
+
+            tabPanels.forEach((panel) => {
+                const isActive = panel.dataset.panel === tabName;
+                panel.classList.toggle("active", isActive);
+                panel.hidden = !isActive;
+            });
+        }
+
+        function setBusyState(isBusy) {
+            if (!statusEl) {
+                return;
+            }
+            statusEl.classList.toggle("busy", isBusy);
+            statusEl.textContent = isBusy ? "Обработка..." : "";
+        }
+
+        function showToast(message, isError = false) {
+            toastEl.textContent = message;
+            toastEl.classList.toggle("error", isError);
+            toastEl.classList.add("show");
+
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toastEl.classList.remove("show");
+            }, 2500);
+        }
+
+        function scheduleProcessing() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                void processInput();
+            }, 300);
+        }
+
+        async function processInput() {
+            const sourceText = inputEl.value;
+            if (!sourceText.trim()) {
+                if (activeController) {
+                    activeController.abort();
+                }
+                outputEl.value = "";
+                setBusyState(false);
+                return;
+            }
+
+            if (activeController) {
+                activeController.abort();
+            }
+            activeController = new AbortController();
+
+            const requestId = ++latestRequestId;
+            setBusyState(true);
+
+            try {
+                const response = await fetch("/process", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text: sourceText }),
+                    signal: activeController.signal
+                });
+
+                const isJson = response.headers.get("content-type")?.includes("application/json");
+                const payload = isJson ? await response.json() : null;
+
+                if (!response.ok || !payload || payload.success !== true) {
+                    const errorText = payload?.error || `Server returned ${response.status}`;
+                    throw new Error(errorText);
+                }
+
+                if (requestId < latestAppliedId) {
+                    return;
+                }
+
+                latestAppliedId = requestId;
+                outputEl.value = payload.result;
+            } catch (error) {
+                if (error.name === "AbortError") {
+                    return;
+                }
+                showToast(error.message || "Не удалось обработать текст.", true);
+            } finally {
+                if (requestId === latestRequestId) {
+                    setBusyState(false);
+                }
+            }
+        }
+
+        function parsePollText(text) {
+            const lines = text
+                .split(/\r?\n/)
+                .map((line) => line.trim())
+                .filter((line) => line.length > 0);
+
+            if (lines.length === 0) {
+                return null;
+            }
+
+            const [question, ...answerLines] = lines;
+            if (!question) {
+                throw new Error("Укажите вопрос в первой строке.");
+            }
+
+            if (answerLines.length === 0) {
+                throw new Error("Добавьте варианты ответа на новых строках.");
+            }
+
+            const answers = answerLines.map((line, index) => {
+                const match = line.match(/^(\S+)\s+(.+)$/u);
+                if (!match) {
+                    throw new Error(`Строка ${index + 2}: формат должен быть "эмодзи текст ответа".`);
+                }
+
+                const answer = match[2].trim();
+                if (!answer) {
+                    throw new Error(`Строка ${index + 2}: текст ответа не может быть пустым.`);
+                }
+
+                return {
+                    icon: match[1],
+                    answer
+                };
+            });
+
+            const payload = {
+                mode: "percent",
+                answers,
+                question,
+                needLogin: true
+            };
+
+            if (multipleChoiceToggleEl.checked) {
+                payload.isMultipleChoice = true;
+            }
+
+            return payload;
+        }
+
+        function generatePollCode() {
+            const rawText = pollInputEl.value;
+            pollErrorEl.textContent = "";
+
+            if (!rawText.trim()) {
+                pollOutputEl.value = "";
+                return;
+            }
+
+            try {
+                const payload = parsePollText(rawText);
+                pollOutputEl.value = payload ? JSON.stringify(payload, null, 2) : "";
+            } catch (error) {
+                pollOutputEl.value = "";
+                pollErrorEl.textContent = error.message || "Не удалось сгенерировать JSON.";
+            }
+        }
+
+        async function copyResult() {
+            const value = outputEl.value;
+            if (!value.trim()) {
+                showToast("Пока нечего копировать.", true);
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(value);
+                showToast("Результат скопирован.");
+            } catch {
+                outputEl.select();
+                document.execCommand("copy");
+                showToast("Результат скопирован.");
+            }
+        }
+
+        async function pasteInput() {
+            try {
+                const text = await navigator.clipboard.readText();
+                inputEl.value = text;
+                scheduleProcessing();
+                showToast("Текст вставлен из буфера.");
+            } catch {
+                showToast("Не удалось прочитать буфер обмена.", true);
+            }
+        }
+
+        function clearHtmlTab() {
+            if (activeController) {
+                activeController.abort();
+            }
+            clearTimeout(debounceTimer);
+            inputEl.value = "";
+            outputEl.value = "";
+            setBusyState(false);
+            showToast("Поля очищены.");
+        }
+
+        async function copyPollResult() {
+            const value = pollOutputEl.value;
+            if (!value.trim()) {
+                showToast("Пока нечего копировать.", true);
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(value);
+                showToast("JSON скопирован.");
+            } catch {
+                pollOutputEl.select();
+                document.execCommand("copy");
+                showToast("JSON скопирован.");
+            }
+        }
+
+        async function pastePollInput() {
+            try {
+                const text = await navigator.clipboard.readText();
+                pollInputEl.value = text;
+                generatePollCode();
+                showToast("Текст опроса вставлен из буфера.");
+            } catch {
+                showToast("Не удалось прочитать буфер обмена.", true);
+            }
+        }
+
+        function clearPollTab() {
+            pollInputEl.value = "";
+            pollOutputEl.value = "";
+            pollErrorEl.textContent = "";
+            multipleChoiceToggleEl.checked = false;
+            showToast("Поля очищены.");
+        }
+
+        function clearActiveTab() {
+            if (activeTab === "html") {
+                clearHtmlTab();
+                return;
+            }
+            clearPollTab();
+        }
+
+        tabButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+                setActiveTab(button.dataset.tab);
+            });
+        });
+
+        inputEl.addEventListener("input", scheduleProcessing);
+        pollInputEl.addEventListener("input", generatePollCode);
+        multipleChoiceToggleEl.addEventListener("change", generatePollCode);
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                clearActiveTab();
+                return;
+            }
+
+            if (event.ctrlKey && event.key === "Enter") {
+                if (activeTab === "html") {
+                    clearTimeout(debounceTimer);
+                    void processInput();
+                    return;
+                }
+                generatePollCode();
+            }
+        });
+
+        copyBtn.addEventListener("click", copyResult);
+        pasteBtn.addEventListener("click", pasteInput);
+        clearBtn.addEventListener("click", clearHtmlTab);
+
+        pollCopyBtn.addEventListener("click", copyPollResult);
+        pollPasteBtn.addEventListener("click", pastePollInput);
+        pollClearBtn.addEventListener("click", clearPollTab);
+    </script>
+</body>
+</html>
